@@ -114,7 +114,7 @@ func Connect() {
 			}
 
 		case "getos":
-			SendMessage(conn, osinfo.GetOSInformation())
+			SendMessage(conn, string(osinfo.GetOSInformation()))
 			RemoveNewLineCharFromConnection(conn)
 
 		case "lockscreen":

