@@ -19,17 +19,17 @@ var (
 )
 
 type OsInformation struct {
-	LocalAddr string	`json:"LocalAddr"`
-	StartTime string 	`json:"StartTime"`
-	UserName  string	`json:"UserName"`
-	Os			string	`json:"Os"`
-	SystemVersion string 	`json:"SystemVersion"`
-	Motherboard	motherboardInfo 	`json:"Motherboard"`
-	Bios	string 	`json:"Bios"`
-	Cpu		string  `json:"Cpu"`
-	Memory	string	`json:"Memory"`
-	Disk	string	`json:"Disk"`
-	Interfaces	[]intfInfo	`json:"Interfaces"`
+	LocalAddr     string          `json:"LocalAddr"`
+	StartTime     string          `json:"StartTime"`
+	UserName      string          `json:"UserName"`
+	Os            string          `json:"Os"`
+	SystemVersion string          `json:"SystemVersion"`
+	Motherboard   motherboardInfo `json:"Motherboard"`
+	Bios          string          `json:"Bios"`
+	Cpu           string          `json:"Cpu"`
+	Memory        string          `json:"Memory"`
+	Disk          string          `json:"Disk"`
+	Interfaces    []intfInfo      `json:"Interfaces"`
 }
 
 func GetOSInformation() []byte {
@@ -52,7 +52,7 @@ func GetOSInformation() []byte {
 //计算唯一值
 //MachineGUID
 func AuniqueIdentifier() string {
-	Guid,err:= getMachineGuid()
+	Guid, err := getMachineGuid()
 	if err != nil {
 		fmt.Println(err)
 		return ""
@@ -198,8 +198,8 @@ func getMemory() string {
 
 type intfInfo struct {
 	Name string   `json:"Name"`
-	Ipv4 []string	`json:"Ipv4"`
-	Ipv6 []string	`json:"Ipv6"`
+	Ipv4 []string `json:"Ipv4"`
+	Ipv6 []string `json:"Ipv6"`
 }
 
 //网卡信息
@@ -227,7 +227,7 @@ func getIntfs() []intfInfo {
 }
 
 //主板信息
-func getCpuInfo() (string) {
+func getCpuInfo() string {
 	var s = []struct {
 		Name string
 	}{}
@@ -243,12 +243,12 @@ func getCpuInfo() (string) {
 }
 
 type motherboardInfo struct {
-	Product string	`json:"Product"`
-	SerialNumber string	`json:"SerialNumber"`
+	Product      string `json:"Product"`
+	SerialNumber string `json:"SerialNumber"`
 }
 
 //主板信息
-func getMotherboardInfo() (motherboardInfo) {
+func getMotherboardInfo() motherboardInfo {
 	var motherboard motherboardInfo
 	var s = []struct {
 		Product string

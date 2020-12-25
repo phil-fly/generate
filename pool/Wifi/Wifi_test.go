@@ -7,7 +7,7 @@ import (
 
 func TestWifiCounter_GetWifiInfo(t *testing.T) {
 	wifi := &WifiCounter{}
-	Personal,_:=getPersonal()
+	Personal, _ := getPersonal()
 	t.Log(Personal)
 	wifi.SetShellPath(Personal)
 	wifi.GetWifiInfo()

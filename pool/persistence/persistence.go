@@ -1,34 +1,32 @@
 package persistence
 
 import (
-	"generate/utils/cmd"
+	"github.com/phil-fly/generate/utils/cmd"
 	"golang.org/x/sys/windows/registry"
 	"log"
 	"os"
 )
 
 type name interface {
-
 }
 
 type Persistence struct {
-	folderPath	string
-	filename	string
+	folderPath string
+	filename   string
 }
 
-func (self *Persistence)SetfolderPath(folderPath,folderExt string)  {
-	self.folderPath = folderPath+folderExt
+func (self *Persistence) SetfolderPath(folderPath, folderExt string) {
+	self.folderPath = folderPath + folderExt
 }
 
-func (self *Persistence)Setfilename(filename string)  {
+func (self *Persistence) Setfilename(filename string) {
 	self.filename = filename
 }
 
-
-func (self *Persistence)Enable() error {
+func (self *Persistence) Enable() error {
 	os.MkdirAll(self.folderPath, 0777)
 	// Copy file to install path
-	_,err:= cmd.RunInWindows("xcopy /Y " + self.filename + " " + self.folderPath)
+	_, err := cmd.RunInWindows("xcopy /Y " + self.filename + " " + self.folderPath)
 	if err != nil {
 		return err
 	}
@@ -38,7 +36,7 @@ func (self *Persistence)Enable() error {
 		return err
 	}
 	defer k.Close()
-	err = k.SetStringValue("Hogwarts","\""+self.folderPath+"\\"+self.filename+"\"")
+	err = k.SetStringValue("Hogwarts", "\""+self.folderPath+"\\"+self.filename+"\"")
 	if err != nil {
 		return err
 	}
@@ -54,7 +52,7 @@ func (self *Persistence)Enable() error {
 	return nil
 }
 
-func (self *Persistence)Disable() error {
+func (self *Persistence) Disable() error {
 	os.RemoveAll(self.folderPath)
 
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, registry.ALL_ACCESS)

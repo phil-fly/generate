@@ -10,9 +10,9 @@ func TestPersistence_Enable(t *testing.T) {
 		folderPath: "",
 		filename:   "generate.exe",
 	}
-	Personal,_:= getPersonal()
+	Personal, _ := getPersonal()
 
-	self.SetfolderPath(Personal,"\\windows")
+	self.SetfolderPath(Personal, "\\windows")
 	err := self.Enable()
 	t.Log(err)
 }
@@ -37,9 +37,9 @@ func TestPersistence_Disable(t *testing.T) {
 		folderPath: "",
 		filename:   "generate.exe",
 	}
-	Personal,_:= getPersonal()
+	Personal, _ := getPersonal()
 
-	self.SetfolderPath(Personal,"\\windows")
+	self.SetfolderPath(Personal, "\\windows")
 	err := self.Disable()
 	t.Log(err)
 }

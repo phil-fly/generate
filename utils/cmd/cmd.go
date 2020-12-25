@@ -7,9 +7,9 @@ import (
 	"syscall"
 )
 
-func RunInWindows(cmdstr string) (string,error){
+func RunInWindows(cmdstr string) (string, error) {
 
-	cmd := exec.Command("cmd","/c",  cmdstr)
+	cmd := exec.Command("cmd", "/c", cmdstr)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -24,19 +24,18 @@ func RunInWindows(cmdstr string) (string,error){
 	}
 }
 
-
-func RunCmdReturnByte(cmd string) ([]byte,error) {
+func RunCmdReturnByte(cmd string) ([]byte, error) {
 	cmdExec := exec.Command("cmd", "/C", cmd)
 	cmdExec.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	c, err := cmdExec.Output()
-	return c,err
+	return c, err
 }
 
-func RunCmdReturnString(cmd string) (string,error) {
+func RunCmdReturnString(cmd string) (string, error) {
 	cmdExec := exec.Command("cmd", "/C", cmd)
 	cmdExec.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	c, err := cmdExec.Output()
-	return string(c),err
+	return string(c), err
 }
 
 func RunCmd(cmd string) error {

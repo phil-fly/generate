@@ -12,35 +12,36 @@ import (
 )
 
 type PostbackInf interface {
-
 }
 
 type Postback struct {
-
 }
-
-
 
 type HttpPostback struct {
-	filename string
-	targetUrl	string
-	Content []byte
-	Guid	string
+	filename  string
+	targetUrl string
+	Content   []byte
+	Guid      string
+	rid		  string
 }
 
-func (self *HttpPostback)SetGuid(guid string) {
+func (self *HttpPostback) SetGuid(guid string) {
 	self.Guid = guid
 }
 
-func (self *HttpPostback)SetTargetUrl(targetUrl string) {
+func (self *HttpPostback) SetRid(rid string) {
+	self.rid = rid
+}
+
+func (self *HttpPostback) SetTargetUrl(targetUrl string) {
 	self.targetUrl = targetUrl
 }
 
-func (self *HttpPostback)SetFileName(filename string) {
+func (self *HttpPostback) SetFileName(filename string) {
 	self.filename = filename
 }
 
-func (self *HttpPostback)PostFile() (error) {
+func (self *HttpPostback) PostFile() error {
 	body_buf := bytes.NewBufferString("")
 	body_writer := multipart.NewWriter(body_buf)
 
@@ -81,15 +82,15 @@ func (self *HttpPostback)PostFile() (error) {
 	req.Header.Set("Guid", self.Guid)
 	req.ContentLength = fi.Size() + int64(body_buf.Len()) + int64(close_buf.Len())
 
-	_,err = http.DefaultClient.Do(req)
+	_, err = http.DefaultClient.Do(req)
 	return err
 }
 
-func (self *HttpPostback)PostContent() (error) {
+func (self *HttpPostback) PostContent() error {
 	// 判断 WebHook 通知
 	reader := bytes.NewReader(self.Content)
 
-	request, _ := http.NewRequest("POST", self.targetUrl+"/"+self.filename, reader)
+	request, _ := http.NewRequest("POST", self.targetUrl+"/"+self.rid+"/"+self.filename, reader)
 	request.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	request.Header.Set("Guid", self.Guid)
 	client := http.Client{}
@@ -106,6 +107,6 @@ func (self *HttpPostback)PostContent() (error) {
 	if err != nil {
 		log.Print(err)
 	}
-	log.Print("回应：",string(body))
+	log.Print("回应：", string(body))
 	return nil
 }

