@@ -14,4 +14,10 @@ func TestWechatCounter_GetWxID(t *testing.T) {
 	err := Wechat.SetResourcePath()
 	t.Log(err)
 	t.Log(Wechat.GetWxID())
+
+}
+
+func TestWechatCounter_Wxid2Qrcode(t *testing.T) {
+	Wechat := &WechatCounter{}
+	Wechat.Wxid2Qrcode("wxid_u6ucefs3btb222")
 }

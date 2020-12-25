@@ -119,7 +119,6 @@ func GetChromePwd() (string,error) {
 		if err==nil{
 			Pwdnode.password_value = string(password_value_Decrypt)
 		}
-		fmt.Println(Pwdnode)
 		Pwdnodelist = append(Pwdnodelist, Pwdnode)
 	}
 
@@ -127,7 +126,6 @@ func GetChromePwd() (string,error) {
 	if err != nil {
 		fmt.Println("JSON ERR:", err)
 	}
-	fmt.Println(string(b))
 
 	return string(b),nil
 }

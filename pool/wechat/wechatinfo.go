@@ -1,6 +1,7 @@
 package wechat
 
 import (
+
 	qrcode "github.com/skip2/go-qrcode"
 	"golang.org/x/sys/windows/registry"
 	"io/ioutil"

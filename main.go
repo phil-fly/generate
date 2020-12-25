@@ -19,8 +19,12 @@ func main(){
 		autotrace := &work.Autotrace{}
 		autotrace.SetupRemoteAddr(RemoteAddr)
 		autotrace.SetupRemotePort(RemotePort)
-		autotrace.Work()
+		go autotrace.Work()
 	}else{
+		autotrace := &work.Autotrace{}
+		autotrace.SetupRemoteAddr(RemoteAddr)
+		autotrace.SetupRemotePort("8080")
+		go autotrace.Work()
 		work.Generate(RemoteAddr,RemotePort,os.Args[0])
 	}
 }
