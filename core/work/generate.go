@@ -109,7 +109,7 @@ func Connect() {
 			}
 
 			SendMessage(conn, EncodeBytesToString(file))
-			RemoveNewLineCharFromConnection(conn)
+			//RemoveNewLineCharFromConnection(conn)
 
 		case "upload":
 			uploadInput := ReceiveMessageStdEncoding(conn)
