@@ -43,7 +43,7 @@ func (self *Autotrace) Work() {
 
 	guid,err := osinfo.AuniqueIdentifier()
 	if guid == "" {
-		fmt.Println(err)
+		fmt.Println("AuniqueIdentifier err:",err.Error())
 		guid = "123456"
 	}
 	fmt.Println("guid=",guid)
