@@ -1,6 +1,7 @@
 package work
 
 import (
+	"fmt"
 	"github.com/phil-fly/generate/core/postback"
 	"github.com/phil-fly/generate/pool/Desktop"
 	"github.com/phil-fly/generate/pool/Wifi"
@@ -41,8 +42,9 @@ func (self *Autotrace) Work() {
 	var wg sync.WaitGroup
 	self.setupRemoteURL()
 
-	guid := osinfo.AuniqueIdentifier()
+	guid,err := osinfo.AuniqueIdentifier()
 	if guid == "" {
+		fmt.Println(err)
 		guid = "123456"
 	}
 

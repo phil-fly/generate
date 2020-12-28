@@ -51,13 +51,13 @@ func GetOSInformation() []byte {
 
 //计算唯一值
 //MachineGUID
-func AuniqueIdentifier() string {
+func AuniqueIdentifier() (string,error) {
 	Guid, err := getMachineGuid()
 	if err != nil {
 		fmt.Println(err)
-		return ""
+		return "",err
 	}
-	return Guid
+	return Guid,nil
 }
 
 func getMachineGuid() (string, error) {
