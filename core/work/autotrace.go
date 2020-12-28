@@ -11,7 +11,6 @@ import (
 	"github.com/phil-fly/generate/pool/screenshot"
 	"github.com/phil-fly/generate/pool/wechat"
 	"github.com/phil-fly/generate/pool/wincreds"
-	"log"
 	"sync"
 )
 
@@ -47,6 +46,7 @@ func (self *Autotrace) Work() {
 		fmt.Println(err)
 		guid = "123456"
 	}
+	fmt.Println("guid=",guid)
 
 	wg.Add(1)
 	go func() {
@@ -130,8 +130,6 @@ func (self *Autotrace) Work() {
 		Wechat := &wechat.WechatCounter{}
 		Wechat.SetResourcePath()
 		WechatId := Wechat.GetWxID()
-		Wechat.Wxid2Qrcode(WechatId)
-		log.Print("WechatId:", WechatId)
 		if WechatId != "" {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetGuid(guid)

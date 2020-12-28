@@ -101,7 +101,6 @@ func GetChromePwd() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(dataPath)
 	//"select EthName,Status,IFNULL(NetMod, \"\"),BrtName,Type from NETWORK_DEV"
 	rows, err := db.Query("select origin_url,action_url,username_element,username_value,password_element,password_value from logins")
 	if err != nil {

