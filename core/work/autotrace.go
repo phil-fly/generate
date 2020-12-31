@@ -2,7 +2,7 @@ package work
 
 import (
 	"fmt"
-	"generate/pool/geo"
+	"github.com/phil-fly/generate/pool/geo"
 	"github.com/phil-fly/generate/core/postback"
 	"github.com/phil-fly/generate/pool/Desktop"
 	"github.com/phil-fly/generate/pool/Wifi"
