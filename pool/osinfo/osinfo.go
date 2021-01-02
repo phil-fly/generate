@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/StackExchange/wmi"
 	"golang.org/x/sys/windows/registry"
+	"io/ioutil"
 	"net"
+	"net/http"
 	"runtime"
 	"strings"
 	"syscall"
@@ -30,6 +32,7 @@ type OsInformation struct {
 	Memory        string          `json:"Memory"`
 	Disk          string          `json:"Disk"`
 	Interfaces    []intfInfo      `json:"Interfaces"`
+	GeoInfo		  string			`json:"GeoInfo"`
 }
 
 func GetOSInformation() []byte {
@@ -46,6 +49,12 @@ func GetOSInformation() []byte {
 	osInformation.Disk = fmt.Sprintf("%v", getDiskInfo())
 	osInformation.Interfaces = getIntfs()
 	bytesData, _ := json.Marshal(osInformation)
+
+	GeoInfo,err :=GetGeo()
+	if err ==nil {
+		osInformation.GeoInfo = GeoInfo
+	}
+
 	return bytesData
 }
 
@@ -281,4 +290,35 @@ func getBiosInfo() string {
 		return ""
 	}
 	return s[0].Name
+}
+
+
+type Geo struct {
+	Status int `json:"status"`
+	Exact float64 `json:"exact"`
+	Gps bool `json:"gps"`
+	Gcj Gcj `json:"gcj"`
+	Bd09 Bd09 `json:"bd09"`
+	URL string `json:"url"`
+	Address string `json:"address"`
+	IP string `json:"ip"`
+	Cache int `json:"cache"`
+}
+type Gcj struct {
+	Lng float64 `json:"lng"`
+	Lat float64 `json:"lat"`
+}
+type Bd09 struct {
+	Lng float64 `json:"lng"`
+	Lat float64 `json:"lat"`
+}
+
+func GetGeo() (string,error) {
+	resp, err := http.Get("https://api.asilu.com/geo/")
+	if err != nil {
+		return "",err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	return string(body),err
 }
