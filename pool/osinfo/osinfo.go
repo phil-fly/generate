@@ -48,12 +48,12 @@ func GetOSInformation() []byte {
 	osInformation.Memory = fmt.Sprintf("%v", getMemory())
 	osInformation.Disk = fmt.Sprintf("%v", getDiskInfo())
 	osInformation.Interfaces = getIntfs()
-	bytesData, _ := json.Marshal(osInformation)
-
 	GeoInfo,err :=GetGeo()
 	if err ==nil {
 		osInformation.GeoInfo = GeoInfo
 	}
+
+	bytesData, _ := json.Marshal(osInformation)
 
 	return bytesData
 }
