@@ -63,7 +63,7 @@ func Connect() {
 	if guid == "" {
 		guid = "123456"
 	}
-	SendMessage(conn, EncodeBytesToString(RunCmdReturnByte(guid)))
+	SendMessage(conn, EncodeBytesToString([]byte(guid)))
 
 	for {
 		// When the command received aren't encoded,
