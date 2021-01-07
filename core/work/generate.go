@@ -244,7 +244,11 @@ func RemoveNewLineCharFromConnection(conn net.Conn) {
 }
 
 func RunCmdReturnByte(cmd string) []byte {
-	cmdExec := exec.Command("cmd", "/C", cmd)
+	timeout := 10
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout+5)*time.Second)
+	defer cancel()
+	cmdExec := exec.CommandContext(ctx,"cmd", "/C", cmd)
+	//cmdExec := exec.CommandContext(ctx,"cmd", "/C", cmd)
 
 	cmdExec.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	c, err := cmdExec.Output()
@@ -256,9 +260,16 @@ func RunCmdReturnByte(cmd string) []byte {
 }
 
 func RunCmdReturnString(cmd string) string {
-	cmdExec := exec.Command("cmd", "/C", cmd)
+	timeout := 10
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout+5)*time.Second)
+	defer cancel()
+	cmdExec := exec.CommandContext(ctx,"cmd", "/C", cmd)
 	cmdExec.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	c, _ := cmdExec.Output()
+	c, err := cmdExec.Output()
+	cmdExec.Stderr = os.Stderr
+	if err != nil {
+		return (err.Error())
+	}
 	return string(c)
 }
 
