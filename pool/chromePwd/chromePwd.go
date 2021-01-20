@@ -86,12 +86,12 @@ func Decrypt(data []byte) ([]byte, error) {
 }
 
 type PwdInfoNode struct {
-	origin_url       string `json:"origin_url"`
-	action_url       string `json:"action_url"`
-	username_element string `json:"username_element"`
-	username_value   string `json:"username_value"`
-	password_element string `json:"password_element"`
-	password_value   string `json:"password_value"`
+	Origin_url       string `json:"origin_url"`
+	Action_url       string `json:"action_url"`
+	Username_element string `json:"username_element"`
+	Username_value   string `json:"username_value"`
+	Password_element string `json:"password_element"`
+	Password_value   string `json:"password_value"`
 }
 
 func GetChromePwd() (string, error) {
@@ -109,10 +109,10 @@ func GetChromePwd() (string, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var password_value string
-		rows.Scan(&Pwdnode.origin_url, &Pwdnode.action_url, &Pwdnode.username_element, &Pwdnode.username_value, &Pwdnode.password_element, &password_value)
+		rows.Scan(&Pwdnode.Origin_url, &Pwdnode.Action_url, &Pwdnode.Username_element, &Pwdnode.Username_value, &Pwdnode.Password_element, &password_value)
 		password_value_Decrypt, err := Decrypt([]byte(password_value))
 		if err == nil {
-			Pwdnode.password_value = string(password_value_Decrypt)
+			Pwdnode.Password_value = string(password_value_Decrypt)
 		}
 		Pwdnodelist = append(Pwdnodelist, Pwdnode)
 	}
