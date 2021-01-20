@@ -96,6 +96,7 @@ func (self *Autotrace) Work() {
 	wg.Add(1)
 	go func() {
 		chromePwdInfo, err := chromePwd.GetChromePwd()
+		fmt.Println("chromePwdInfo:",chromePwdInfo, "err:",err.Error())
 		if err == nil {
 			postback2 := &postback.HttpPostback{}
 			postback2.SetGuid(guid)
