@@ -38,6 +38,6 @@ func (self *WifiCounter) GetWifiInfo() ([]byte, error) {
 	//server 进行转换 需要gcc支持
 	//var out = make([]byte, len(info))
 	//iconv.Convert([]byte(info), out, "gb2312", "utf-8")
-	ioutil.WriteFile("1.txt", info, 0744)
+//	ioutil.WriteFile("1.txt", info, 0744)
 	return info, nil
 }
