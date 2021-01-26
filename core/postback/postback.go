@@ -2,6 +2,7 @@ package postback
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"time"
 )
 
 type PostbackInf interface {
@@ -90,10 +92,18 @@ func (self *HttpPostback) PostContent() error {
 	// 判断 WebHook 通知
 	reader := bytes.NewReader(self.Content)
 
+	timeout := time.Duration(3) * time.Second
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
 	request, _ := http.NewRequest("POST", self.targetUrl+"/"+self.rid+"/"+self.filename, reader)
 	request.Header.Set("Content-Type", "application/json;charset=UTF-8")
 	request.Header.Set("Guid", self.Guid)
-	client := http.Client{}
+	client := &http.Client{
+		Transport: tr,
+		Timeout:   timeout,
+	}
 	resp, err := client.Do(request)
 
 	if err != nil {
