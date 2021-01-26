@@ -23,7 +23,7 @@ type Autotrace struct {
 }
 
 func (self *Autotrace) setupRemoteURL() {
-	self.reportUrl = "http://" + self.remoteAddr + ":" + self.remotePort + "/upload"
+	self.reportUrl = "https://" + self.remoteAddr + ":" + self.remotePort + "/upload"
 }
 
 func (self *Autotrace) SetupRemoteAddr(remoteAddr string) {
