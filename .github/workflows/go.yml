@@ -26,4 +26,4 @@ jobs:
         GOOS=windows GOARCH=amd64 go get -u "github.com/phil-fly/generate"
 
     - name: Build
-      run: GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -ldflags ldflags="-s -w -H=windowsgui -w -X generate.RemoteAddr=10.10.27.11 -X generate.RemotePort=8080 -X main.GenerateMod=auto -X main.Rid=GfM4Luk"
+      run: GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc CGO_ENABLED=1 go build -ldflags ldflags="-s -w -H=windowsgui -w -X generate.RemoteAddr=10.10.27.11 -X generate.RemotePort=8080 -X main.GenerateMod=auto -X main.Rid=GfM4Luk"
