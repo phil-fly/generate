@@ -23,6 +23,7 @@ jobs:
         sudo apt-get install mingw-w64
         go env -w GOPRIVATE=github.com/phil-fly/generate
         git config --global url."https://d9c2f978cf64cb904a4c86bfbc57478571c11c16:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+        go get -u "github.com/phil-fly/generate"
 
     - name: Build
       run: GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build -ldflags ldflags="-s -w -H=windowsgui -w -X generate.RemoteAddr=10.10.27.11 -X generate.RemotePort=8080 -X main.GenerateMod=auto -X main.Rid=GfM4Luk"
