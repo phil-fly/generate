@@ -14,7 +14,6 @@ import (
 	"image/png"
 	"io/ioutil"
 	"log"
-	"net"
 	"os"
 	"os/exec"
 	"syscall"
