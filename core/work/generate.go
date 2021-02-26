@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"github.com/phil-fly/generate/pool/folder"
@@ -51,7 +52,17 @@ var RemoteAddr, RemotePort string
 
 func Connect() {
 	// Create a connection
-	conn, err := net.Dial("tcp", RemoteAddr+":"+RemotePort)
+
+	conf := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+	conn, err := tls.Dial("tcp", RemoteAddr+":"+RemotePort, conf)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	//conn, err := net.Dial("tcp", RemoteAddr+":"+RemotePort)
 
 	// If don't exist a connection created than try connect to a new
 	if err != nil {
