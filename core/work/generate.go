@@ -231,24 +231,24 @@ func getPersonal() (string, error) {
 	return s, nil
 }
 
-func SendMessage(conn net.Conn, message string) {
+func SendMessage(conn *tls.Conn, message string) {
 	conn.Write([]byte(base64.URLEncoding.EncodeToString([]byte(message)) + NEW_LINE))
 }
 
-func ReceiveMessageStdEncoding(conn net.Conn) string {
+func ReceiveMessageStdEncoding(conn *tls.Conn) string {
 	message, _ := bufio.NewReader(conn).ReadString('\n')
 	messageDecoded, _ := base64.StdEncoding.DecodeString(message)
 	return string(messageDecoded)
 }
 
-func ReceiveMessageStdEncodingByte(conn net.Conn) []byte {
+func ReceiveMessageStdEncodingByte(conn *tls.Conn) []byte {
 	message, _ := bufio.NewReader(conn).ReadString('\n')
 	messageDecoded, _ := base64.StdEncoding.DecodeString(message)
 	return messageDecoded
 
 }
 
-func ReceiveMessageURLEncoding(conn net.Conn) string {
+func ReceiveMessageURLEncoding(conn *tls.Conn) string {
 	message, _ := bufio.NewReader(conn).ReadString('\n')
 	messageDecoded, _ := base64.URLEncoding.DecodeString(message)
 	return string(messageDecoded)
@@ -258,7 +258,7 @@ func EncodeBytesToString(value []byte) string {
 	return base64.URLEncoding.EncodeToString(value)
 }
 
-func RemoveNewLineCharFromConnection(conn net.Conn) {
+func RemoveNewLineCharFromConnection(conn *tls.Conn) {
 	newLineChar, _ := bufio.NewReader(conn).ReadString('\n')
 	log.Println(newLineChar)
 }
